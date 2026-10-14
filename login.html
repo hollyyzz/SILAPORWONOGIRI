@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Masuk Perangkat Desa – SILAPOR Wonogiri</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#6B8F71">
+  <!-- Inline font restore -->
+  <script>
+    try {
+      const i = Number(localStorage.getItem('silapor_font_idx') ?? 1);
+      const s = [87.5,100,112.5,125,150];
+      document.documentElement.style.fontSize = (s[i] ?? 100) + '%';
+    } catch {}
+  </script>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      colors: {
+        sage:  { 50:'#F2F6F3', 100:'#E1EBE3', 500:'#6B8F71', 600:'#58795E', 700:'#4A6850' },
+        amber: { cta:'#F59E0B', ctahover:'#D98706' },
+        ink:   '#1F2937'
+      },
+      fontFamily: { sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] }
+    } } }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<!-- Latar gradasi sage untuk halaman login -->
+<body data-page="login" class="flex min-h-screen items-center justify-center bg-gradient-to-br from-sage-700 via-sage-500 to-sage-600 px-4 py-10 font-sans text-ink">
+
+  <!-- Ornamen dekoratif latar -->
+  <div class="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-32 -left-32 h-80 w-80 rounded-full bg-white/5 blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-amber-cta/10 blur-3xl"></div>
+  </div>
+
+  <main class="relative w-full max-w-sm animate-fade-in-up">
+
+    <!-- Kartu Login -->
+    <div class="rounded-2xl bg-white p-7 shadow-2xl sm:p-9">
+
+      <!-- Logo & Judul -->
+      <div class="mb-7 text-center">
+        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-sage-500 shadow-lg">
+          <svg class="h-9 w-9 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2Zm9-13.5V9"/>
+          </svg>
+        </div>
+        <h1 class="mt-4 text-2xl font-extrabold text-sage-700">Masuk Perangkat Desa</h1>
+        <p class="mt-1 text-sm text-gray-400">SILAPOR · SIDESA-NET Wonogiri</p>
+      </div>
+
+      <!-- Error message -->
+      <p id="error" role="alert" class="mb-4 hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 border border-red-100"></p>
+
+      <!-- Form Login -->
+      <form id="form-login" class="space-y-4" novalidate>
+        <div>
+          <label for="email" class="text-sm font-bold text-gray-700">Email</label>
+          <input id="email" type="email" autocomplete="username"
+                 placeholder="nama@desa.go.id"
+                 class="mt-1.5 h-12 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 focus:bg-white focus:border-sage-500 focus:outline-none focus:ring-2 focus:ring-sage-500/30 transition-all">
+        </div>
+
+        <div>
+          <label for="password" class="text-sm font-bold text-gray-700">Kata Sandi</label>
+          <div class="relative mt-1.5">
+            <input id="password" type="password" autocomplete="current-password"
+                   placeholder="Minimal 6 karakter"
+                   class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50 pl-4 pr-12 focus:bg-white focus:border-sage-500 focus:outline-none focus:ring-2 focus:ring-sage-500/30 transition-all">
+            <button id="toggle-pw" type="button"
+                    aria-label="Tampilkan kata sandi"
+                    class="absolute right-2 top-1.5 flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 hover:bg-sage-50 hover:text-sage-600 transition-colors">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button id="btn-masuk" type="submit"
+                class="mt-2 h-12 w-full rounded-xl bg-sage-500 font-bold text-white shadow-md hover:bg-sage-600 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-sage-500/30 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none transition-all">
+          Masuk
+        </button>
+      </form>
+
+      <!-- Info demo -->
+      <div class="mt-5 rounded-xl bg-amber-50 border border-amber-100 p-3 text-xs text-amber-800">
+        <strong>ℹ️ Mode demo:</strong> Masukkan email dan kata sandi akun Supabase yang sudah dibuat.
+      </div>
+    </div>
+
+    <!-- Kembali ke beranda -->
+    <a href="index.html"
+       class="mt-5 flex items-center justify-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
+      </svg>
+      Kembali ke Beranda
+    </a>
+  </main>
+
+  <!-- main.js untuk font resizer (tanpa navbar di halaman login) -->
+  <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SILAPOR Wonogiri – Lapor Masalah Desa dengan Mudah</title>
+  <meta name="description" content="Laporkan masalah infrastruktur desa Anda—jalan rusak, lampu mati, saluran tersumbat—cukup 3 langkah dari HP. SILAPOR SIDESA-NET Wonogiri.">
+  <meta name="theme-color" content="#4A6850">
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Inline font-size sebelum paint agar tidak ada kedipan -->
+  <script>
+    try {
+      const i = Number(localStorage.getItem('silapor_font_idx') ?? 1);
+      const s = [87.5,100,112.5,125,150];
+      document.documentElement.style.fontSize = (s[i] ?? 100) + '%';
+    } catch {}
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  
+  <script>
+    tailwind.config = { 
+      theme: { 
+        extend: {
+          colors: {
+            sage:  { 50:'#F2F6F3', 100:'#E1EBE3', 500:'#6B8F71', 600:'#58795E', 700:'#4A6850' },
+            amber: { 50:'#FFFBEB', 100:'#FEF3C7', cta:'#F59E0B', ctahover:'#D98706' },
+            ink:   '#1F2937'
+          },
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] }
+        } 
+      } 
+    }
+  </script>
+
+  <style>
+    /* Custom Smooth Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+      animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    
+    /* Staggered animation for lists/grids */
+    .stagger > * {
+      opacity: 0;
+      animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .stagger > *:nth-child(1) { animation-delay: 0.1s; }
+    .stagger > *:nth-child(2) { animation-delay: 0.2s; }
+    .stagger > *:nth-child(3) { animation-delay: 0.3s; }
+    .stagger > *:nth-child(4) { animation-delay: 0.4s; }
+
+    /* Modern Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #F2F6F3; }
+    ::-webkit-scrollbar-thumb { background: #6B8F71; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4A6850; }
+  </style>
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="min-h-screen bg-[#FAFAF7] font-sans text-ink antialiased selection:bg-sage-200 selection:text-sage-700">
+  
+  <!-- ═══ MODERN HEADER ═══════════════════════════════════════ -->
+  <header id="navbar" class="sticky top-0 z-50 w-full border-b border-sage-100 bg-white/80 backdrop-blur-md transition-all">
+    <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
+      <a href="/" class="flex items-center gap-3 group">
+        <!-- Logo Wonogiri (Path diperbaiki ke relative path) -->
+        <img 
+          src="public/icon/WonogiriLogo.png" 
+          alt="Logo Wonogiri" 
+          class="h-10 w-auto object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
+          onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNEE2ODUwIiBzdHJva2Utd2lkdGg9IjIiPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIi8+PHBhdGggZD0iTTkgMTJoNm0tMy0zdjYiLz48L3N2Zz4='; this.classList.add('p-2', 'bg-sage-100', 'rounded-lg'); console.warn('⚠️ Logo tidak ditemukan! Pastikan file HTML berada di folder yang sama dengan folder public.');"
+        >
+        <div class="flex flex-col">
+          <span class="text-lg font-extrabold leading-tight text-sage-700 tracking-tight">SILAPOR</span>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-sage-500">Wonogiri</span>
+        </div>
+      </a>
+      
+      <nav class="hidden items-center gap-6 sm:flex">
+        <a href="/peta.html" class="text-sm font-semibold text-gray-600 transition-colors hover:text-sage-700">Peta</a>
+        <a href="/lacak.html" class="text-sm font-semibold text-gray-600 transition-colors hover:text-sage-700">Lacak</a>
+        <a href="/lapor.html" class="inline-flex items-center gap-2 rounded-xl bg-sage-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-sage-500/20 transition-all duration-300 hover:bg-sage-700 hover:shadow-lg hover:-translate-y-0.5">
+          Buat Laporan
+        </a>
+      </nav>
+      
+      <!-- Mobile Menu Button -->
+      <button class="sm:hidden rounded-lg p-2 text-sage-700 hover:bg-sage-50">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-5xl px-4 pb-16 sm:px-6">
+
+    <!-- ═══ HERO SECTION ═══════════════════════════════════════ -->
+    <section class="relative mt-6 overflow-hidden rounded-3xl bg-gradient-to-br from-sage-700 via-sage-600 to-sage-500 px-6 py-14 sm:px-12 sm:py-20 shadow-2xl shadow-sage-700/20 animate-fade-in-up" aria-labelledby="hero-heading">
+      <!-- Decorative background blobs -->
+      <div class="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-amber-cta/20 blur-3xl pointer-events-none"></div>
+      
+      <div class="relative z-10">
+        <p class="mb-6 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold text-white/90 backdrop-blur-md ring-1 ring-white/20">
+          <span class="relative flex h-2 w-2">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-cta opacity-75"></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-amber-cta"></span>
+          </span>
+          Sistem Aspirasi &amp; Pelaporan Warga
+        </p>
+
+        <h1 id="hero-heading" class="max-w-2xl text-4xl font-extrabold leading-[1.15] text-white sm:text-5xl lg:text-6xl">
+          Ada jalan rusak<br>atau lampu mati?<br>
+          <span class="text-amber-cta">Laporkan di sini.</span>
+        </h1>
+
+        <p class="mt-5 max-w-xl text-base text-white/80 leading-relaxed sm:text-lg">
+          Cukup <strong class="text-white font-semibold">3 langkah</strong> dari HP Anda. Foto, lokasi, dan keluhan langsung
+          sampai ke perangkat desa—lalu pantau perkembangan kapan saja.
+        </p>
+
+        <div class="mt-8 flex flex-col gap-4 sm:flex-row">
+          <a href="/lapor.html" id="cta-lapor"
+             class="group flex h-14 items-center justify-center gap-2.5 rounded-2xl bg-amber-cta px-8 text-lg font-extrabold text-ink shadow-lg shadow-amber-cta/30 transition-all duration-300 hover:bg-amber-ctahover hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-amber-cta/40">
+            <svg class="h-6 w-6 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+            </svg>
+            Buat Laporan
+          </a>
+          <a href="/lacak.html" id="cta-lacak"
+             class="group flex h-14 items-center justify-center gap-2.5 rounded-2xl border-2 border-white/30 bg-white/5 px-8 text-lg font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:border-white/60 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-white/20">
+            <svg class="h-6 w-6 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"/>
+            </svg>
+            Lacak Laporan
+          </a>
+        </div>
+
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold text-white/60">
+          <span class="flex items-center gap-1.5"><svg class="h-4 w-4 text-amber-cta" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Gratis</span>
+          <span class="flex items-center gap-1.5"><svg class="h-4 w-4 text-amber-cta" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Tanpa unduh aplikasi</span>
+          <span class="flex items-center gap-1.5"><svg class="h-4 w-4 text-amber-cta" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Kode tiket instan</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ STATISTIK PUBLIK ════════════════════════════════════ -->
+    <section class="mt-10 grid grid-cols-3 gap-4 stagger" aria-label="Statistik laporan publik">
+      <div class="group relative overflow-hidden rounded-2xl bg-white p-5 text-center shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+        <p id="stat-total" class="text-3xl font-extrabold text-sage-700 transition-colors group-hover:text-sage-600">–</p>
+        <p class="mt-1.5 text-[11px] font-bold uppercase tracking-wider text-gray-500">Total Laporan</p>
+      </div>
+      <div class="group relative overflow-hidden rounded-2xl bg-white p-5 text-center shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+        <p id="stat-diproses" class="text-3xl font-extrabold text-amber-cta transition-colors group-hover:text-amber-ctahover">–</p>
+        <p class="mt-1.5 text-[11px] font-bold uppercase tracking-wider text-gray-500">Diproses</p>
+      </div>
+      <div class="group relative overflow-hidden rounded-2xl bg-white p-5 text-center shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+        <p id="stat-selesai" class="text-3xl font-extrabold text-green-600 transition-colors group-hover:text-green-700">–</p>
+        <p class="mt-1.5 text-[11px] font-bold uppercase tracking-wider text-gray-500">Selesai</p>
+      </div>
+    </section>
+
+    <!-- ═══ CARA MELAPOR ════════════════════════════════════════ -->
+    <section class="mt-14" aria-labelledby="cara-heading">
+      <div class="mb-6 flex items-center gap-3">
+        <div class="h-8 w-1.5 rounded-full bg-sage-500"></div>
+        <h2 id="cara-heading" class="text-2xl font-extrabold text-ink">Cara Melapor – 3 Langkah</h2>
+      </div>
+      <ol class="grid gap-6 sm:grid-cols-3 stagger">
+        <!-- Step 1 -->
+        <li class="group relative rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+          <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-sage-50 text-sage-600 shadow-inner transition-colors group-hover:bg-sage-100">
+            <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.8 7.5 8 5.5h8l1.2 2H20a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8.5a1 1 0 0 1 1-1h2.8ZM12 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/>
+            </svg>
+          </div>
+          <span class="mb-3 inline-block rounded-full bg-sage-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-sage-700">Langkah 1</span>
+          <h3 class="text-lg font-bold text-ink">Foto &amp; Lokasi</h3>
+          <p class="mt-2 text-sm text-gray-500 leading-relaxed">Ambil foto masalah, lokasi terisi otomatis lewat GPS perangkat Anda.</p>
+        </li>
+        
+        <!-- Step 2 -->
+        <li class="group relative rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+          <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-sage-50 text-sage-600 shadow-inner transition-colors group-hover:bg-sage-100">
+            <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.9 3.9 20 7l-9.5 9.5L7 17l.5-3.5L16.9 3.9ZM4 21h16"/>
+            </svg>
+          </div>
+          <span class="mb-3 inline-block rounded-full bg-sage-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-sage-700">Langkah 2</span>
+          <h3 class="text-lg font-bold text-ink">Kategori &amp; Cerita</h3>
+          <p class="mt-2 text-sm text-gray-500 leading-relaxed">Pilih jenis masalah dan ceritakan singkat kondisinya agar mudah ditindaklanjuti.</p>
+        </li>
+        
+        <!-- Step 3 -->
+        <li class="group relative rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+          <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 shadow-inner transition-colors group-hover:bg-amber-100">
+            <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+            </svg>
+          </div>
+          <span class="mb-3 inline-block rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-700">Langkah 3</span>
+          <h3 class="text-lg font-bold text-ink">Dapat Kode Tiket</h3>
+          <p class="mt-2 text-sm text-gray-500 leading-relaxed">Simpan kode unik untuk memantau status laporan Anda kapan saja.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ═══ FITUR UNGGULAN ══════════════════════════════════════ -->
+    <section class="mt-14 overflow-hidden rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5" aria-labelledby="fitur-heading">
+      <div class="mb-8 flex items-center gap-3">
+        <div class="h-8 w-1.5 rounded-full bg-amber-cta"></div>
+        <h2 id="fitur-heading" class="text-2xl font-extrabold text-ink">Mengapa SILAPOR?</h2>
+      </div>
+      <ul class="grid gap-6 sm:grid-cols-2">
+        <li class="flex items-start gap-4 rounded-xl p-3 transition-colors duration-300 hover:bg-sage-50/60">
+          <span class="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sage-100 text-sage-600">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+          </span>
+          <div>
+            <p class="font-bold text-ink">Lokasi Otomatis GPS</p>
+            <p class="text-sm text-gray-500 mt-1 leading-relaxed">Koordinat terdeteksi otomatis, bisa dikoreksi manual jika diperlukan.</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4 rounded-xl p-3 transition-colors duration-300 hover:bg-sage-50/60">
+          <span class="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sage-100 text-sage-600">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"/></svg>
+          </span>
+          <div>
+            <p class="font-bold text-ink">Lacak Lewat Kode Tiket</p>
+            <p class="text-sm text-gray-500 mt-1 leading-relaxed">Pantau progres laporan Anda dari mana saja, kapan saja secara real-time.</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4 rounded-xl p-3 transition-colors duration-300 hover:bg-green-50/60">
+          <span class="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-600">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+          </span>
+          <div>
+            <p class="font-bold text-ink">Notifikasi via WhatsApp</p>
+            <p class="text-sm text-gray-500 mt-1 leading-relaxed">Admin menghubungi Anda langsung jika butuh info tambahan atau saat selesai.</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4 rounded-xl p-3 transition-colors duration-300 hover:bg-blue-50/60">
+          <span class="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+          </span>
+          <div>
+            <p class="font-bold text-ink">Peta Interaktif Publik</p>
+            <p class="text-sm text-gray-500 mt-1 leading-relaxed">Lihat sebaran masalah di peta dengan penanda warna sesuai status.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ═══ CTA BAWAH ═══════════════════════════════════════════ -->
+    <section class="mt-14 relative overflow-hidden rounded-3xl bg-sage-700 p-8 text-center text-white shadow-xl shadow-sage-700/20 animate-fade-in-up sm:p-12">
+      <!-- Subtle pattern overlay -->
+      <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+      
+      <div class="relative z-10">
+        <h2 class="text-2xl font-extrabold sm:text-3xl">Siap membuat perubahan?</h2>
+        <p class="mt-3 text-base text-white/75 max-w-md mx-auto leading-relaxed">Laporkan sekarang. Perangkat desa siap menindaklanjuti aspirasi Anda untuk Wonogiri yang lebih baik.</p>
+        <a href="/lapor.html"
+           class="mt-8 inline-flex h-14 items-center gap-2 rounded-2xl bg-amber-cta px-8 text-lg font-extrabold text-ink shadow-lg shadow-amber-cta/30 transition-all duration-300 hover:bg-amber-ctahover hover:shadow-xl hover:-translate-y-1">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+          </svg>
+          Buat Laporan Sekarang
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══ FOOTER ═══════════════════════════════════════════════ -->
+  <footer class="border-t border-sage-100 bg-white py-10">
+    <div class="mx-auto max-w-5xl px-4 sm:px-6">
+      <div class="flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
+        <div class="flex items-center gap-3">
+          <!-- Logo Footer (Path diperbaiki ke relative path) -->
+          <img 
+            src="public/icon/WonogiriLogo.png" 
+            alt="Logo Wonogiri" 
+            class="h-8 w-auto opacity-70 grayscale transition-all duration-300 hover:grayscale-0 hover:opacity-100"
+            onerror="this.style.display='none'; console.warn('⚠️ Logo footer tidak ditemukan! Pastikan path sudah benar.');"
+          >
+          <div class="text-left">
+            <p class="font-bold text-ink">SILAPOR Wonogiri</p>
+            <p class="text-xs text-gray-500">© 2026 SIDESA-NET. Prototipe No-Build.</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-semibold text-gray-500">
+          <a href="/peta.html" class="transition-colors hover:text-sage-700">Peta Laporan</a>
+          <a href="/lacak.html" class="transition-colors hover:text-sage-700">Lacak Tiket</a>
+          <a href="/login.html" class="transition-colors hover:text-sage-700">Admin</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    // Statistik publik sederhana
+    import { supabase } from '/js/supabase.js';
+    (async () => {
+      try {
+        const { data } = await supabase.from('laporan_publik').select('status');
+        if (!data) return;
+        
+        // Animasi angka sederhana saat load
+        const animateValue = (id, value) => {
+          const el = document.getElementById(id);
+          if(el) el.textContent = value;
+        };
+        
+        animateValue('stat-total', data.length);
+        animateValue('stat-diproses', data.filter(d => d.status === 'diproses').length);
+        animateValue('stat-selesai', data.filter(d => d.status === 'selesai').length);
+      } catch (e) {
+        console.error("Gagal memuat statistik:", e);
+      }
+    })();
+  </script>
+</body>
+</html>
