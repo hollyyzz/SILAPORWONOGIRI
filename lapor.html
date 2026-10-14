@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Buat Laporan – SILAPOR Wonogiri</title>
+  <meta name="description" content="Laporkan masalah infrastruktur desa Anda dalam 3 langkah mudah melalui SILAPOR SIDESA-NET Wonogiri.">
+  <meta name="theme-color" content="#6B8F71">
+  <!-- Inline font restore -->
+  <script>
+    try {
+      const i = Number(localStorage.getItem('silapor_font_idx') ?? 1);
+      const s = [87.5,100,112.5,125,150];
+      document.documentElement.style.fontSize = (s[i] ?? 100) + '%';
+    } catch {}
+  </script>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Leaflet untuk peta mini di langkah 1 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      colors: {
+        sage:  { 50:'#F2F6F3', 100:'#E1EBE3', 500:'#6B8F71', 600:'#58795E', 700:'#4A6850' },
+        amber: { cta:'#F59E0B', ctahover:'#D98706' },
+        ink:   '#1F2937'
+      },
+      fontFamily: { sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] }
+    } } }
+  </script>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="min-h-screen bg-[#FAFAF7] pb-28 font-sans text-ink">
+  <header id="navbar"></header>
+
+  <main class="mx-auto max-w-3xl px-4 py-6">
+
+    <!-- Tombol Kembali -->
+    <a href="/index.html"
+       class="mb-5 inline-flex items-center gap-2 rounded-xl border border-sage-100 bg-white px-4 py-2.5 text-sm font-semibold text-sage-700 shadow-sm hover:bg-sage-50 transition-all">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
+      </svg>
+      Kembali ke Beranda
+    </a>
+
+    <!-- Stepper -->
+    <ol id="stepper" class="mb-7 flex items-center" aria-label="Langkah pelaporan"></ol>
+
+    <!-- Error global -->
+    <p id="error" role="alert" class="mb-4 hidden rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm font-semibold text-red-700"></p>
+
+    <!-- ══ LANGKAH 1 – FOTO & LOKASI ═══════════════════════════ -->
+    <section data-step="1" class="space-y-4 animate-fade-in-up">
+      <div class="rounded-2xl bg-white p-5 shadow-md">
+        <h2 class="text-xl font-extrabold text-sage-700">📸 Foto &amp; Lokasi</h2>
+        <p class="mt-1 text-sm text-gray-500">Ambil foto masalah yang ingin dilaporkan.</p>
+
+        <!-- Area unggah foto -->
+        <label for="foto" class="mt-4 flex min-h-[12rem] cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed border-sage-300 bg-sage-50 text-sage-700 transition-all hover:border-sage-500 hover:bg-sage-100">
+          <img id="foto-preview" alt="Pratinjau foto laporan" class="hidden max-h-72 w-full rounded-2xl object-cover">
+          <span id="foto-hint" class="flex flex-col items-center gap-2 p-6 text-center">
+            <svg class="h-12 w-12 text-sage-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.8 7.5 8 5.5h8l1.2 2H20a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8.5a1 1 0 0 1 1-1h2.8ZM12 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/>
+            </svg>
+            <span class="font-bold text-base">Ketuk untuk ambil foto</span>
+            <span class="text-xs text-gray-400">Kamera atau galeri · JPG/PNG · Maks 500 KB</span>
+          </span>
+        </label>
+        <input id="foto" type="file" accept="image/*" capture="environment" class="sr-only">
+      </div>
+
+      <!-- Peta mini & GPS -->
+      <div class="rounded-2xl bg-white p-5 shadow-md">
+        <h3 class="font-bold text-sage-700">📍 Lokasi Kejadian</h3>
+        <p class="mt-1 text-xs text-gray-500">GPS akan aktif otomatis. Geser pin untuk koreksi.</p>
+        <div id="peta-mini" class="relative mt-3 h-52 overflow-hidden rounded-2xl bg-sage-100" role="application" aria-label="Peta mini lokasi"></div>
+        <p id="gps-status" class="mt-3 text-sm text-gray-500" aria-live="polite">
+          <span class="inline-block h-2 w-2 rounded-full bg-gray-300 mr-1.5"></span>Lokasi belum diambil.
+        </p>
+        <button id="btn-gps" type="button"
+                class="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-sage-500 font-bold text-sage-700 hover:bg-sage-50 focus:outline-none focus:ring-2 focus:ring-sage-500 transition-all">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3m0 12v3M3 12h3m12 0h3M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/>
+          </svg>
+          Ambil Lokasi Saya (GPS)
+        </button>
+      </div>
+    </section>
+
+    <!-- ══ LANGKAH 2 – KATEGORI & DESKRIPSI ═══════════════════ -->
+    <section data-step="2" class="hidden space-y-4 animate-fade-in-up">
+      <div class="rounded-2xl bg-white p-5 shadow-md">
+        <h2 class="text-xl font-extrabold text-sage-700">📋 Kategori &amp; Deskripsi</h2>
+        <p class="mt-1 text-sm text-gray-500">Pilih jenis masalah yang Anda temukan.</p>
+        <div id="kategori" class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4" role="radiogroup" aria-label="Pilih kategori masalah"></div>
+      </div>
+
+      <div class="rounded-2xl bg-white p-5 shadow-md space-y-4">
+        <div>
+          <label for="deskripsi" class="font-bold text-ink">Ceritakan masalahnya</label>
+          <textarea id="deskripsi" rows="4" maxlength="500"
+                    placeholder="Contoh: Lubang besar di jalan dekat balai desa, membahayakan motor dan pejalan kaki."
+                    class="mt-2 w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-3.5 focus:bg-white transition-all focus:border-sage-500 focus:outline-none focus:ring-2 focus:ring-sage-500/30"></textarea>
+          <p class="mt-1.5 text-right text-xs text-gray-400">
+            <span id="hitung" class="font-semibold text-ink">0</span>/500 karakter (minimal 10)
+          </p>
+        </div>
+
+        <div>
+          <label for="nama" class="font-bold text-ink">
+            Nama
+            <span class="ml-1 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-500">Opsional</span>
+          </label>
+          <input id="nama" type="text" autocomplete="name"
+                 placeholder="Nama Anda (boleh dikosongkan)"
+                 class="mt-2 h-12 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 focus:bg-white focus:outline-none transition-all">
+        </div>
+
+        <div>
+          <label for="wa" class="font-bold text-ink">
+            Nomor WhatsApp
+            <span class="ml-1 rounded-md bg-red-50 px-2 py-0.5 text-xs font-normal text-red-500">Wajib</span>
+          </label>
+          <input id="wa" type="tel" inputmode="tel" placeholder="08xxxxxxxxxx" autocomplete="tel"
+                 class="mt-2 h-12 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 focus:bg-white focus:outline-none transition-all">
+          <p class="mt-1.5 flex items-center gap-1.5 text-xs text-gray-400">
+            <svg class="h-3.5 w-3.5 text-sage-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+            </svg>
+            Hanya dilihat perangkat desa untuk menghubungi Anda. Tidak ditampilkan ke publik.
+          </p>
+        </div>
+
+        <div>
+          <label for="alamat" class="font-bold text-ink">
+            Alamat / Nama Lokasi
+            <span class="ml-1 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-500">Opsional</span>
+          </label>
+          <input id="alamat" type="text" placeholder="Contoh: Jl. Merdeka RT 02/03, Dusun Wonokerto"
+                 class="mt-2 h-12 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 focus:bg-white focus:outline-none transition-all">
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ LANGKAH 3 – KONFIRMASI ══════════════════════════════ -->
+    <section data-step="3" class="hidden space-y-4 animate-fade-in-up">
+      <div class="rounded-2xl bg-white p-5 shadow-md">
+        <h2 class="text-xl font-extrabold text-sage-700">✅ Konfirmasi Laporan</h2>
+        <p class="mt-1 text-sm text-gray-500">Periksa kembali sebelum dikirim.</p>
+
+        <img id="s-foto" alt="Foto laporan" class="mt-4 max-h-64 w-full rounded-2xl object-cover shadow-sm">
+
+        <dl class="mt-4 divide-y divide-gray-50 text-sm">
+          <div class="flex items-start justify-between gap-3 py-3.5">
+            <div>
+              <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Lokasi</dt>
+              <dd id="s-lokasi" class="mt-0.5 font-semibold text-ink"></dd>
+            </div>
+            <button type="button" data-goto="1" class="shrink-0 rounded-xl px-3 py-2 text-sm font-bold text-sage-600 hover:bg-sage-50 transition-colors">✏️ Ubah</button>
+          </div>
+          <div class="flex items-start justify-between gap-3 py-3.5">
+            <div>
+              <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Kategori</dt>
+              <dd id="s-kategori" class="mt-0.5 font-semibold text-ink"></dd>
+            </div>
+            <button type="button" data-goto="2" class="shrink-0 rounded-xl px-3 py-2 text-sm font-bold text-sage-600 hover:bg-sage-50 transition-colors">✏️ Ubah</button>
+          </div>
+          <div class="py-3.5">
+            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Deskripsi</dt>
+            <dd id="s-deskripsi" class="mt-0.5 font-semibold text-ink leading-relaxed"></dd>
+          </div>
+          <div class="py-3.5">
+            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Pelapor</dt>
+            <dd id="s-kontak" class="mt-0.5 font-semibold text-ink"></dd>
+          </div>
+        </dl>
+
+        <!-- Privacy notice -->
+        <p class="mt-3 rounded-xl bg-sage-50 p-3 text-xs text-sage-700">
+          🔒 Nomor WhatsApp Anda hanya dilihat oleh perangkat desa dan tidak ditampilkan ke publik.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══ LAYAR SUKSES ════════════════════════════════════════ -->
+    <section id="sukses" class="hidden animate-fade-in-up">
+      <div class="rounded-2xl bg-white p-8 text-center shadow-md">
+        <!-- Ikon sukses -->
+        <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-sage-50 text-sage-600 shadow-inner">
+          <svg class="h-11 w-11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7"/>
+          </svg>
+        </div>
+
+        <h2 class="mt-5 text-2xl font-extrabold text-sage-700">Laporan Terkirim! 🎉</h2>
+        <p class="mt-2 text-sm text-gray-500">Simpan kode tiket ini untuk memantau laporan Anda.</p>
+
+        <!-- Kode Tiket -->
+        <div class="mt-6 rounded-2xl bg-sage-50 p-5 ring-2 ring-sage-200">
+          <p class="text-xs font-semibold uppercase tracking-widest text-sage-500">Kode Tiket Anda</p>
+          <p id="ticket" class="mt-2 select-all text-3xl font-extrabold tracking-wider text-sage-700">#LPR-000000-000</p>
+        </div>
+
+        <div class="mt-5 space-y-3">
+          <button id="btn-salin" type="button"
+                  class="flex h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-sage-500 font-bold text-sage-700 hover:bg-sage-50 transition-all">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"/>
+            </svg>
+            Salin Kode Tiket
+          </button>
+          <a id="link-lacak" href="/lacak.html"
+             class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-cta font-bold text-ink shadow-md hover:bg-amber-ctahover hover:-translate-y-0.5 transition-all">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"/>
+            </svg>
+            Lacak Laporan Ini
+          </a>
+          <a href="/index.html" class="block py-3 text-sm font-semibold text-sage-700 hover:underline">
+            ← Kembali ke Beranda
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bar aksi sticky bawah -->
+  <div id="aksi" class="fixed inset-x-0 bottom-0 z-20 border-t border-sage-100 bg-white/95 p-3 backdrop-blur-md shadow-lg">
+    <div class="mx-auto flex max-w-3xl gap-3">
+      <button id="btn-prev" type="button"
+              class="hidden h-12 flex-1 rounded-xl border-2 border-sage-500 font-bold text-sage-700 hover:bg-sage-50 transition-all">
+        ← Kembali
+      </button>
+      <button id="btn-next" type="button"
+              class="h-12 flex-[2] rounded-xl bg-amber-cta font-bold text-ink shadow-md hover:bg-amber-ctahover hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none transition-all">
+        Lanjut →
+      </button>
+    </div>
+  </div>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module" src="/js/lapor.js"></script>
+</body>
+</html>
